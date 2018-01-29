@@ -1,34 +1,34 @@
 /**
-*  Polargraph Server for Arduino UNO and MEGA compatible boards.
-*  Written by Sandy Noble
-*  Released under GNU License version 3.
-*  http://www.polargraph.co.uk
-*  https://github.com/euphy/polargraph_server_a1
+   Polargraph Server for Arduino UNO and MEGA compatible boards.
+   Written by Sandy Noble
+   Released under GNU License version 3.
+   http://www.polargraph.co.uk
+   https://github.com/euphy/polargraph_server_a1
 
 
-CONFIGURATION!! Read this! Really.
-==================================
+  CONFIGURATION!! Read this! Really.
+  ==================================
 
-Kung fu is like a game of chess. You must think first! Before you move.
+  Kung fu is like a game of chess. You must think first! Before you move.
 
-This is a unified codebase for a few different versions of Polargraph Server.
+  This is a unified codebase for a few different versions of Polargraph Server.
 
-You can control how it is compiled by changing the #define lines below.
+  You can control how it is compiled by changing the #define lines below.
 
-There are five config sections:
-1. Specify what kind of controller board you are using
-2. Add some libraries if you have a MEGA
-3. Specify what kind of motor driver you are using:
+  There are five config sections:
+  1. Specify what kind of controller board you are using
+  2. Add some libraries if you have a MEGA
+  3. Specify what kind of motor driver you are using:
   i. Adafruit Motorshield v1
   ii. Adafruit Motorshield v2
   iii. Discrete stepper drivers (eg EasyDriver, stepstick, Pololu gear).*
   iv. Signal amplifier like a UNL2003*
-4.  Turn on some debugging code
-5.  Disable program features if you need to free up space
+  4.  Turn on some debugging code
+  5.  Disable program features if you need to free up space
 
-* For motor drivers iii and iv, you will need to change the values in
+  For motor drivers iii and iv, you will need to change the values in
   configuration.ino to set the exact pins the drivers are wired up to.
-  
+
 */
 
 
@@ -43,7 +43,7 @@ There are five config sections:
 
 // 2. Add some libraries if you have a MEGA
 // ========================================
-// Uncomment the SPI and SD lines below if you have a MEGA.  
+// Uncomment the SPI and SD lines below if you have a MEGA.
 // http://forum.arduino.cc/index.php?topic=173584.0
 //#include <SPI.h>
 //#include <SD.h>
@@ -55,8 +55,8 @@ There are five config sections:
 
 //   i. Adafruit Motorshield v1. The original, and still the best.
 //   -------------------------------------------------------------
-#define ADAFRUIT_MOTORSHIELD_V1
-#include <AFMotor.h>
+//#define ADAFRUIT_MOTORSHIELD_V1
+//#include <AFMotor.h>
 
 //   ii. Adafruit Motorshield v2. It's all squealy.
 //   ----------------------------------------------
@@ -68,9 +68,9 @@ There are five config sections:
 //   iii. Using discrete stepper drivers? (eg EasyDriver, stepstick, Pololu gear)
 //   ----------------------------------------------------------------------------
 //   Don't forget to define your pins in 'configuration.ino'.
-//#define SERIAL_STEPPER_DRIVERS 
+#define SERIAL_STEPPER_DRIVERS
 
-//   iv. Using a signal amplifier like a UNL2003? 
+//   iv. Using a signal amplifier like a UNL2003?
 //   --------------------------------------------
 //   Don't forget to define your pins in 'configuration.ino'.
 //   #define UNL2003_DRIVER
@@ -92,9 +92,9 @@ There are five config sections:
 
 
 
-/*  ===========================================================  
+/*  ===========================================================
     These variables are common to all polargraph server builds
-=========================================================== */    
+  =========================================================== */
 
 // ==========================================================
 // Some microcontroller's names
@@ -186,7 +186,7 @@ static char inParam4[14];
 
 static byte inNoOfParams;
 
-char lastCommand[INLENGTH+1];
+char lastCommand[INLENGTH + 1];
 boolean commandConfirmed = false;
 
 int rebroadcastReadyInterval = 5000;
@@ -214,9 +214,9 @@ static byte globalDrawDirectionMode = DIR_MODE_AUTO;
 #endif
 
 #if MICROCONTROLLER == MC_MEGA
-  #define READY_STR "READY_100"
+#define READY_STR "READY_100"
 #else
-  #define READY_STR "READY"
+#define READY_STR "READY"
 #endif
 
 #define RESEND_STR "RESEND"
@@ -255,35 +255,35 @@ const static String CMD_SETMOTORSPEED = "C31";
 const static String CMD_SETMOTORACCEL = "C32";
 const static String CMD_SETMACHINESTEPMULTIPLIER = "C37";
 
-void setup() 
+void setup()
 {
   Serial.begin(57600);           // set up Serial library at 57600 bps
   Serial.println("POLARGRAPH ON!");
   Serial.print("Hardware: ");
   Serial.println(MICROCONTROLLER);
-  
-  #if MICROCONTROLLER == MC_MEGA
+
+#if MICROCONTROLLER == MC_MEGA
   Serial.println("MC_MEGA");
-  #elif MICROCONTROLLER == MC_UNO
+#elif MICROCONTROLLER == MC_UNO
   Serial.println("MC_UNO");
-  #else
+#else
   Serial.println("No MC");
-  #endif
+#endif
   configuration_motorSetup();
   eeprom_loadMachineSpecFromEeprom();
   configuration_setup();
 
   motorA.setMaxSpeed(currentMaxSpeed);
-  motorA.setAcceleration(currentAcceleration);  
+  motorA.setAcceleration(currentAcceleration);
   motorB.setMaxSpeed(currentMaxSpeed);
   motorB.setAcceleration(currentAcceleration);
-  
+
   float startLength = ((float) startLengthMM / (float) mmPerRev) * (float) motorStepsPerRev;
   motorA.setCurrentPosition(startLength);
   motorB.setCurrentPosition(startLength);
-  for (int i = 0; i<INLENGTH; i++) {
+  for (int i = 0; i < INLENGTH; i++) {
     lastCommand[i] = 0;
-  }    
+  }
   comms_ready();
 
 #ifdef PENLIFT
@@ -295,9 +295,9 @@ void setup()
 
 void loop()
 {
-  if (comms_waitForNextCommand(lastCommand)) 
+  if (comms_waitForNextCommand(lastCommand))
   {
-#ifdef DEBUG_COMMS    
+#ifdef DEBUG_COMMS
     Serial.print(F("Last comm: "));
     Serial.print(lastCommand);
     Serial.println(F("..."));
